@@ -9,7 +9,7 @@ import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.reference.CtFieldReference;
 import spoon.reflect.visitor.CtScanner;
 
-public class VisitorClass extends CtScanner  {
+public class VisitorClass extends CtScanner    {
     private static int visited = 0;//number of class 
     private static int countLigne = 0;//Number of codeline 
     private static int countMethod = 0;//number of methode
