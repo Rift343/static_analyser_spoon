@@ -2,18 +2,20 @@ package com.static_analyzer_spoon.cli_analyse;
 
 import java.util.Collection;
 
+import com.static_analyzer_spoon.Processor.ProcessorStaticAnalyze;
 import com.static_analyzer_spoon.visitor.VisitorClass;
 
 import spoon.Launcher;
 import spoon.MavenLauncher;
 import spoon.reflect.CtModel;
-import spoon.reflect.declaration.CtClass;
-import spoon.reflect.declaration.CtType;
 
 public abstract class AbsractLauncher {
+
+    
     
     protected static String path;
     protected static boolean forMaven;
+    protected static ProcessorStaticAnalyze processorStaticAnalyze = new ProcessorStaticAnalyze();
 
     public static void analyse()
     {
@@ -22,6 +24,7 @@ public abstract class AbsractLauncher {
         launcher.buildModel();
         
         CtModel model = launcher.getModel();
+        processorStaticAnalyze.process(model);
 
         
     }
@@ -29,20 +32,18 @@ public abstract class AbsractLauncher {
     public static void analyseforMaven()
     {
         System.out.println("Begin analyze");
-        VisitorClass visitorClass = new VisitorClass();
         MavenLauncher launcher = new MavenLauncher(path, MavenLauncher.SOURCE_TYPE.APP_SOURCE);
         launcher.buildModel();
         CtModel model = launcher.getModel();
-        Collection<CtType<?>> allclass = model.getAllTypes();
-        for (CtType<?> ctType : allclass) {
-            ctType.accept(visitorClass);
-        }
-        System.out.println(visitorClass.getVisited());
-        System.out.println(visitorClass.getCountLigne());
+        processorStaticAnalyze.process(model);
         
 
 
+        
         
     }
+
+
+    
 
 }

@@ -2,7 +2,6 @@ package com.static_analyzer_spoon.visitor;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Set;
 
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtMethod;
@@ -14,30 +13,80 @@ public class VisitorClass extends CtScanner    {
     private static int countLigne = 0;//Number of codeline 
     private static int countMethod = 0;//number of methode
     private static double avgLigneMethod = 0;//average number of ligne in a methode
-    private static double avgMethodClear = 0;//average number of methode in a class
-    private static double avgFiel = 0;//average number of fielf in a class
-    private ArrayList<ClassComparator> comporableList = new ArrayList<>();//list to compare the number of Field,methode and codeligne.
-    
+    private static double avgMethodClass = 0;//average number of methode in a class
+    private static double avgField = 0;//average number of field in a class
+    private ArrayList<ClassComparator> comparableList = new ArrayList<>();//list to compare the number of Field,methode and codeligne.
+    private static int maxParametre = 0;//max number of parametre in a methode
+
     @Override
     public <T> void visitCtClass(CtClass<T> ctClass) {
-        this.visited = visited + 1;
+        //Number of class
+        visited = visited + 1;
         
+        //Number of ligne code
         String sourceCode = ctClass.getOriginalSourceFragment().getSourceCode();
         String[] allLigne = sourceCode.split("\n");
         countLigne = countLigne + allLigne.length;
+
+        //Number of methode
+        Collection<CtMethod<?>> allMethode = ctClass.getMethods();
+        countMethod = countMethod + allMethode.size();
+
+        VisitorMethode visitorMethode = new VisitorMethode();
+        //Average number of ligne in a methode (just add not divide by the number of methode)
+        for (CtMethod<?> ctMethod : allMethode) {
+            ctMethod.accept(visitorMethode);
+            avgLigneMethod = avgLigneMethod + VisitorMethode.getLigneNumber();
+            maxParametre = VisitorMethode.getMaxParametre();
+        }
+
+        //Average number of field in a class (just add not divide by the number of class)
+        Collection<CtFieldReference<?>> allField = ctClass.getAllFields(); 
+        avgField = avgField + allField.size();
         
-        
+        // ADD a new ClassComparator to the list
+        ClassComparator classComparator = new ClassComparator(allMethode.size(), allField.size(), allField.size(), ctClass.getSimpleName());
+        comparableList.add(classComparator);
+
         
         
         super.visitCtClass(ctClass);
     }
 
+    
+
     public int getVisited(){
-        return this.visited;
+        return visited;
     }
 
     public int getCountLigne(){
         return countLigne;
     }
+
+    public int getCountMethod() {
+        return countMethod;
+    }
+
+    public double getAvgLigneMethod() {
+        return avgLigneMethod;
+    }
+
+    public double getAvgMethodClass() {
+        return avgMethodClass;
+    }
+
+    public double getAvgField() {
+        return avgField;
+    }
+
+    public ArrayList<ClassComparator> getComparableList() {
+        return comparableList;
+    }
+
+    public int getMaxParametre() {
+        return maxParametre;
+    }
+
+   
 
 }

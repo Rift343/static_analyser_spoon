@@ -14,7 +14,7 @@ public class MainCLI {
         for (String arg : args) {
             switch (arg) {
 
-                case "--forMaven"://for analyses for maven
+                case "--ForMaven"://for analyses for maven
                     forMaven = true;
                     break;
 
@@ -47,7 +47,8 @@ public class MainCLI {
         }
 
         if (withCLI) {
-            LauncherCLI launcher = new LauncherCLI(path,forMaven);            
+            LauncherCLI launcher = new LauncherCLI(path,forMaven);     
+               
         }
     }
 }
