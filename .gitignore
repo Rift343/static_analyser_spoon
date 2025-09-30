@@ -1,3 +1,3 @@
-.class
-.jar
-.lst
+*.class
+*.jar
+*.lst

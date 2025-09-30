@@ -36,6 +36,7 @@ public abstract class AbsractLauncher {
         launcher.buildModel();
         CtModel model = launcher.getModel();
         processorStaticAnalyze.process(model);
+        processorStaticAnalyze.show();
         
 
 

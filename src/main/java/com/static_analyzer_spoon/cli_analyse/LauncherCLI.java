@@ -11,6 +11,7 @@ public class LauncherCLI extends AbsractLauncher{
         path = pathString;
         forMaven = forMavenInput;
         LauncherCLI.analyseforMaven();
+        
         System.out.println("End of the program");  
         
         

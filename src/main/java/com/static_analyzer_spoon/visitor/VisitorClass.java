@@ -45,11 +45,8 @@ public class VisitorClass extends CtScanner    {
         avgField = avgField + allField.size();
         
         // ADD a new ClassComparator to the list
-        ClassComparator classComparator = new ClassComparator(allMethode.size(), allField.size(), allField.size(), ctClass.getSimpleName());
+        ClassComparator classComparator = new ClassComparator(allMethode.size(), allField.size(), allLigne.length, ctClass.getSimpleName());
         comparableList.add(classComparator);
-
-        
-        
         super.visitCtClass(ctClass);
     }
 
