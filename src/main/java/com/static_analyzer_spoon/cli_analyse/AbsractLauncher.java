@@ -17,6 +17,7 @@ public abstract class AbsractLauncher {
 
     public static void analyse()
     {
+        System.out.println("Begin analyze");
         Launcher launcher = new Launcher();
         launcher.addInputResource(path);
         launcher.buildModel();

@@ -10,7 +10,12 @@ public class LauncherCLI extends AbsractLauncher{
     public LauncherCLI (String pathString, boolean forMavenInput) {
         path = pathString;
         forMaven = forMavenInput;
-        LauncherCLI.analyseforMaven();
+        if (forMavenInput) {
+            LauncherCLI.analyseforMaven();    
+        }
+        else {
+            LauncherCLI.analyse();
+        }
 
         Scanner scannerCLI = new Scanner(System.in);
         String input = "";
@@ -31,6 +36,7 @@ public class LauncherCLI extends AbsractLauncher{
             System.out.println("+-------------------------------------------------------------------------------------------------------------+");
             System.out.println("|You can now use the following commands :                                                                     |");
             System.out.println("|visitedClass : show the number of visited class                                                              |");
+            System.out.println("|visitedPackage : show the number of visited class                                                              |");
             System.out.println("|countLigne : show the number of code line                                                                    |");
             System.out.println("|countMethod : show the number of method                                                                      |");
             System.out.println("|maxParameter : show the maximum number of parameter in a method                                              |");
@@ -64,6 +70,9 @@ public class LauncherCLI extends AbsractLauncher{
 
                 case "visitedClass":
                     processorStaticAnalyze.showVisitedClass();
+                    break;
+                case "visitedPackage":
+                    processorStaticAnalyze.showVisitedPackage();
                     break;
                 case "countLigne":
                     processorStaticAnalyze.showCountLigne();

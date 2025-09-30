@@ -5,13 +5,16 @@ import java.util.Collection;
 
 import com.static_analyzer_spoon.visitor.ClassComparator;
 import com.static_analyzer_spoon.visitor.VisitorClass;
+import com.static_analyzer_spoon.visitor.VisitorPackage;
 
 import spoon.reflect.CtModel;
+import spoon.reflect.declaration.CtPackage;
 import spoon.reflect.declaration.CtType;
 
 public class ProcessorStaticAnalyze {
 
     private int visited;
+    private int visitedPackage;
     private int countLigne;
     private int countMethod;
     private double avgLigneMethod;
@@ -39,6 +42,14 @@ public class ProcessorStaticAnalyze {
         this.allComparable = visitorClass.getComparableList();
         this.top10Index = Math.max(1, allComparable.size() / 10);
         this.calculAvg();
+
+        VisitorPackage visitorPackage = new VisitorPackage();
+        Collection<CtPackage> allPackage = model.getAllPackages();
+        for (CtPackage pack : allPackage) {
+            pack.accept(visitorPackage);
+        }
+
+        visitedPackage = visitorPackage.getVisited();
     }
 
     public void calculAvg()
@@ -70,6 +81,11 @@ public class ProcessorStaticAnalyze {
     public void showVisitedClass()
     {
         System.out.println("Nombre de classes visitées : " + visited);
+    }
+
+    public void showVisitedPackage()
+    {
+        System.out.println("Nombre de packages visités : " + visitedPackage);
     }
 
     public void showCountLigne()
@@ -167,7 +183,7 @@ public class ProcessorStaticAnalyze {
             System.out.println("    Aucune classe ne possède plus de " + x + " méthodes.");
         }
     }
-    
+
     public void show() {
         showVisitedClass();
         showCountLigne();
