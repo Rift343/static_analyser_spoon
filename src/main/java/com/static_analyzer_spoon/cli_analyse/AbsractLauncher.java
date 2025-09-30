@@ -1,9 +1,7 @@
 package com.static_analyzer_spoon.cli_analyse;
 
-import java.util.Collection;
 
 import com.static_analyzer_spoon.Processor.ProcessorStaticAnalyze;
-import com.static_analyzer_spoon.visitor.VisitorClass;
 
 import spoon.Launcher;
 import spoon.MavenLauncher;
@@ -36,7 +34,7 @@ public abstract class AbsractLauncher {
         launcher.buildModel();
         CtModel model = launcher.getModel();
         processorStaticAnalyze.process(model);
-        processorStaticAnalyze.show();
+        
         
 
 
