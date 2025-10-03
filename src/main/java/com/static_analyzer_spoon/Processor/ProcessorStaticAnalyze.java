@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import com.static_analyzer_spoon.visitor.ClassComparator;
+import com.static_analyzer_spoon.visitor.GraphMethode;
 import com.static_analyzer_spoon.visitor.VisitorClass;
 import com.static_analyzer_spoon.visitor.VisitorPackage;
 
@@ -23,6 +24,7 @@ public class ProcessorStaticAnalyze {
     private int maxParametre;
     private int  top10Index; // Ensure at least one class is shown
     private ArrayList<ClassComparator> allComparable;
+    private GraphMethode graph = new GraphMethode();
 
     public void process(CtModel model)
     {

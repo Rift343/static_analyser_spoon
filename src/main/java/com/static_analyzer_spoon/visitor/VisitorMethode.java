@@ -1,12 +1,20 @@
 package com.static_analyzer_spoon.visitor;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import spoon.reflect.code.CtInvocation;
 import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.reference.CtExecutableReference;
 import spoon.reflect.visitor.CtScanner;
+import spoon.reflect.visitor.filter.TypeFilter;
 
 public class VisitorMethode extends CtScanner {
 
     private static int maxParametre = 0;//max number of parametre in a methode
     private static int ligneNumber = 0;//number of codeligne in a methode
+    private static Collection<String> allMethodCalled;//The method called by the methode
     
     @Override
     public <T> void visitCtMethod(CtMethod<T> CtMethod) {
@@ -20,6 +28,20 @@ public class VisitorMethode extends CtScanner {
         String sourceCodeMethode = CtMethod.getOriginalSourceFragment().getSourceCode();
         String[] allLigneMethode = sourceCodeMethode.split("\n");
         ligneNumber = allLigneMethode.length;
+
+        List<CtInvocation<?>> invocations = CtMethod.getElements(new TypeFilter<>(CtInvocation.class));
+        List<CtExecutableReference<?>> calledMethods = invocations.stream()
+                                                                  .map(inv -> (CtExecutableReference<?>) inv.getExecutable())
+                                                                  .collect(Collectors.toList());
+        allMethodCalled = calledMethods.stream()
+            .map(ref -> ref.getDeclaringType() != null
+                ? ref.getDeclaringType().getQualifiedName() + "." + ref.getSimpleName()
+                : ref.getSimpleName())
+            .collect(Collectors.toList());
+        
+        allMethodCalled.forEach(string -> {GraphMethode.add(CtMethod.getDeclaringType().getQualifiedName() + "." + CtMethod.getSimpleName(),string );});//Add to the graph the method call
+
+        
         
         super.visitCtMethod(CtMethod);
     }

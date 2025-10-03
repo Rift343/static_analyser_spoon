@@ -17,6 +17,7 @@ public class VisitorClass extends CtScanner    {
     private static double avgField = 0;//average number of field in a class
     private ArrayList<ClassComparator> comparableList = new ArrayList<>();//list to compare the number of Field,methode and codeligne.
     private static int maxParametre = 0;//max number of parametre in a methode
+    private static GraphMethode graph = new GraphMethode();
 
     @Override
     public <T> void visitCtClass(CtClass<T> ctClass) {
