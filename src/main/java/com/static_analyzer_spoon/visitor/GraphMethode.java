@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import org.graphstream.graph.*;
 import org.graphstream.graph.implementations.*;
+import org.graphstream.ui.swing_viewer.ViewPanel;
+import org.graphstream.ui.view.Viewer;
 
 public class GraphMethode {
 
@@ -37,6 +39,11 @@ public static void visualize() {
     System.setProperty("org.graphstream.ui", "swing"); // Pour forcer l'affichage en Swing
 
     Graph graph = new SingleGraph("Call Graph");
+    graph.setAttribute("ui.quality");
+    graph.setAttribute("ui.antialias");
+
+    
+
 
     for (String from : mapClassLigne.keySet()) {
         if (graph.getNode(from) == null) {
@@ -55,8 +62,20 @@ public static void visualize() {
         }
     }
 
-    graph.setAttribute("ui.stylesheet", "node { fill-color: lightblue; size: 20px; text-size: 14px; } edge { arrow-shape: arrow; }");
-    graph.display();
+    
+graph.setAttribute("ui.stylesheet", "node { text-mode: normal; fill-color: lightblue; text-color: black; size: 10px;  } node:hover { text-mode: normal; text-color: black; } edge { arrow-shape: arrow;fill-color:#222;arrow-size:5px,3px; } ");
+Viewer viewer = graph.display(false);
+ViewPanel viewPanel = (ViewPanel) viewer.getDefaultView();
+viewPanel.setPreferredSize(new java.awt.Dimension(2000, 2000));
+viewPanel.setVisible(true);
+
+viewPanel.resizeFrame(2000, 2000);
+viewPanel.getCamera().setViewCenter(0, 0, 0);
+
+
+
+viewer.enableAutoLayout();
+    
 }
 
 
