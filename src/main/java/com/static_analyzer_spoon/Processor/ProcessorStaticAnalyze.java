@@ -234,4 +234,8 @@ public class ProcessorStaticAnalyze {
         return maxParametre;
     }
 
+    public int getVisitedPackage() {
+        return visitedPackage;
+    }
+
 }

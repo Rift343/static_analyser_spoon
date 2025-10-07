@@ -1,6 +1,7 @@
 package com.static_analyzer_spoon;
 
 import com.static_analyzer_spoon.cli_analyse.LauncherCLI;
+import com.static_analyzer_spoon.cli_analyse.LauncherGUI;
 
 public class MainCLI {
 
@@ -49,6 +50,10 @@ public class MainCLI {
         if (withCLI) {
             LauncherCLI launcher = new LauncherCLI(path,forMaven);     
                
+        }
+        if (withGui) {
+            LauncherGUI launcherGUI = new LauncherGUI(path,forMaven);
+            
         }
     }
 }
