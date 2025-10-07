@@ -129,6 +129,16 @@ public class ProcessorStaticAnalyze {
         }
     }
 
+    public String  getTOP10classByField()
+    {
+        String buffer = "Top 10% des classes avec le plus d'attributs"+"\n";
+        sortClassComparatorByField();
+        for (int i = 0; i < top10Index ; i++) {
+            buffer = buffer + "    Rang :"+ i+1 +" Classe : " + allComparable.get(i).getSimpleName() + " | Nombre de champs : " + allComparable.get(i).getFieldCount() + "\n";
+        }
+        return buffer;
+    }
+
     public void showTOP10classByMethod()
     {
         System.out.println("Top 10% des classes avec le plus de méthodes");
@@ -136,6 +146,17 @@ public class ProcessorStaticAnalyze {
         for (int i = 0; i < top10Index ; i++) {
             System.out.println("    Rang :"+ i+1 +" Classe : " + allComparable.get(i).getSimpleName() + " | Nombre de méthodes : " + allComparable.get(i).getMethodeCount());
         }
+    }
+
+    public String getTOP10classByMethod()
+    {
+        String buffer = "Top 10% des classes avec le plus de méthodes"+"\n";
+        sortClassComparatorByMethode();
+        for (int i = 0; i < top10Index ; i++) {
+            buffer = buffer + "    Rang :"+ i+1 +" Classe : " + allComparable.get(i).getSimpleName() + " | Nombre de méthodes : " + allComparable.get(i).getMethodeCount() + "\n";
+        }
+
+        return buffer;
     }
 
     public void showTOP10classByLigne()
@@ -146,6 +167,18 @@ public class ProcessorStaticAnalyze {
             System.out.println("    Rang :"+ i+1 +" Classe : " + allComparable.get(i).getSimpleName() + " | Nombre de lignes : " + allComparable.get(i).getLigneCount());
         }
     }
+
+    public String getTOP10classByLigne()
+    {
+        String buffer = "Top 10% des classes avec le plus de lignes"+"\n";
+        sortClassComparatorByLigne();
+        for (int i = 0; i < top10Index ; i++) {
+            buffer = buffer + "    Rang :"+ i+1 +" Classe : " + allComparable.get(i).getSimpleName() + " | Nombre de lignes : " + allComparable.get(i).getLigneCount() + "\n";
+        }
+        return buffer;
+    }
+
+    
 
     public void showTOP10classByFieldAndMethod() {
         System.out.println("Top 10% des classes avec le plus d'attributs ET de méthodes");
@@ -171,6 +204,33 @@ public class ProcessorStaticAnalyze {
         }
     }
 
+    public String getTOP10classByFieldAndMethod() {
+        String buffer = "Top 10% des classes avec le plus d'attributs ET de méthodes\n";
+        sortClassComparatorByField();
+        ArrayList<ClassComparator> topField = new ArrayList<>(allComparable.subList(0, top10Index));
+        sortClassComparatorByMethode();
+        ArrayList<ClassComparator> topMethod = new ArrayList<>(allComparable.subList(0, top10Index));
+        ArrayList<ClassComparator> intersection = new ArrayList<>();
+        for (ClassComparator c : topField) {
+            if (topMethod.contains(c)) {
+                intersection.add(c);
+            }
+        }
+        if (intersection.isEmpty()) {
+            buffer = buffer + "    Aucune classe ne fait partie du top 10% à la fois pour les attributs et les méthodes.\n";
+        } else {
+            for (int i = 0; i < intersection.size(); i++) {
+                ClassComparator c = intersection.get(i);
+                buffer = buffer +"    Rang :" + (i + 1) + " Classe : " + c.getSimpleName() +
+                    " | Nombre de champs : " + c.getFieldCount() +
+                    " | Nombre de méthodes : " + c.getMethodeCount()+"\n";
+            }
+        }
+        return buffer;
+    }
+
+
+
 
     public void showClassesWithMoreThanXMethods(int x) {
         System.out.println("Classes avec plus de " + x + " méthodes :");
@@ -185,6 +245,8 @@ public class ProcessorStaticAnalyze {
             System.out.println("    Aucune classe ne possède plus de " + x + " méthodes.");
         }
     }
+
+    
 
     public void show() {
         showVisitedClass();
