@@ -9,7 +9,8 @@ import org.graphstream.ui.view.Viewer;
 
 public class GraphMethode {
 
-    private static final HashMap<GraphNode, Collection<GraphNode>> mapClassLigne = new java.util.HashMap<>();
+    private static HashMap<GraphNode, Collection<GraphNode>> mapClassLigne = new java.util.HashMap<>();
+    private static int fullRelationCount = 0;
 
     public static void add(GraphNode methode, GraphNode newMethodMethode)
     {
@@ -18,11 +19,13 @@ public class GraphMethode {
             Collection<GraphNode> list = mapClassLigne.get(methode);
             list.add(newMethodMethode);
             mapClassLigne.put(methode, list);
+            fullRelationCount = fullRelationCount + 1;
         } else 
         {
             Collection<GraphNode> listMethode = new java.util.ArrayList<>();
             listMethode.add(newMethodMethode);
             mapClassLigne.put(methode, listMethode);
+            fullRelationCount = fullRelationCount + 1;
         }
     }
 
@@ -33,52 +36,67 @@ public class GraphMethode {
         }
     }
 
-    
 
-public static void visualize() {
-    System.setProperty("org.graphstream.ui", "swing"); // Pour forcer l'affichage en Swing
-
-    Graph graph = new SingleGraph("Call Graph");
-    graph.setAttribute("ui.quality");
-    graph.setAttribute("ui.antialias");
 
     
 
+    public static void visualize() {
+        System.setProperty("org.graphstream.ui", "swing"); // Pour forcer l'affichage en Swing
 
-    for (GraphNode key : mapClassLigne.keySet()) {
-        String from = key.toString();
-        if (graph.getNode(from) == null) {
-            graph.addNode(from).setAttribute("ui.label", from);
-        }
-    
-        for (GraphNode node : mapClassLigne.get(key)) {
-            String to = node.toString();
-            if (graph.getNode(to) == null) {
-                graph.addNode(to).setAttribute("ui.label", to);
+        Graph graph = new SingleGraph("Call Graph");
+        graph.setAttribute("ui.quality");
+        graph.setAttribute("ui.antialias");
+
+        
+
+
+        for (GraphNode key : mapClassLigne.keySet()) {
+            String from = key.toString();
+            if (graph.getNode(from) == null) {
+                graph.addNode(from).setAttribute("ui.label", from);
             }
-    
-            String edgeId = from + "->" + to;
-            if (graph.getEdge(edgeId) == null) {
-                graph.addEdge(edgeId, from, to, true); // true = orienté
+        
+            for (GraphNode node : mapClassLigne.get(key)) {
+                String to = node.toString();
+                if (graph.getNode(to) == null) {
+                    graph.addNode(to).setAttribute("ui.label", to);
+                }
+        
+                String edgeId = from + "->" + to;
+                if (graph.getEdge(edgeId) == null) {
+                    graph.addEdge(edgeId, from, to, true); // true = orienté
+                }
             }
         }
+
+        
+        graph.setAttribute("ui.stylesheet", "node { text-mode: normal; fill-color: lightblue; text-color: black; size: 10px;  } node:hover { text-mode: normal; text-color: black; } edge { arrow-shape: arrow;fill-color:#222;arrow-size:5px,3px; } ");
+        Viewer viewer = graph.display(false);
+        ViewPanel viewPanel = (ViewPanel) viewer.getDefaultView();
+        viewPanel.setPreferredSize(new java.awt.Dimension(2000, 2000));
+        viewPanel.setVisible(true);
+
+        viewPanel.resizeFrame(2000, 2000);
+        viewPanel.getCamera().setViewCenter(0, 0, 0);
+
+
+
+        viewer.enableAutoLayout();
     }
 
-    
-graph.setAttribute("ui.stylesheet", "node { text-mode: normal; fill-color: lightblue; text-color: black; size: 10px;  } node:hover { text-mode: normal; text-color: black; } edge { arrow-shape: arrow;fill-color:#222;arrow-size:5px,3px; } ");
-Viewer viewer = graph.display(false);
-ViewPanel viewPanel = (ViewPanel) viewer.getDefaultView();
-viewPanel.setPreferredSize(new java.awt.Dimension(2000, 2000));
-viewPanel.setVisible(true);
-
-viewPanel.resizeFrame(2000, 2000);
-viewPanel.getCamera().setViewCenter(0, 0, 0);
-
-
-
-viewer.enableAutoLayout();
-    
-}
+    private static Float couplage(String firstclassName,String secondClassName){
+        Float couplage = 0.0f;
+        for (GraphNode key : mapClassLigne.keySet()) {
+            if(key.getClassName().equals(firstclassName)){
+                for (GraphNode node : mapClassLigne.get(key)) {
+                    if(node.getClassName().equals(secondClassName)){
+                        couplage += 1.0f;
+                    }
+                }
+            }
+        }
+        return couplage;
+    }
 
 
 
