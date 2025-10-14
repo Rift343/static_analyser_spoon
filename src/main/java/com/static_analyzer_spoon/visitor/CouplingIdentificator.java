@@ -28,12 +28,12 @@ public class CouplingIdentificator {
         
     }
 
-    private void incrementRelation()
+    public void incrementRelation()
     {
         this.numberOfRelation = this.numberOfRelation + 1;
     }   
 
-    private void computeCouplingValue(int totalRelation)
+    public void computeCouplingValue(int totalRelation)
     {
         if (totalRelation == 0)
         {
@@ -45,7 +45,7 @@ public class CouplingIdentificator {
         }
     }
 
-    private Double getCouplingValue()
+    public Double getCouplingValue()
     {
         return this.couplingValue;
     }
@@ -66,6 +66,14 @@ public class CouplingIdentificator {
     @Override
     public int hashCode() {
         return firstClass.hashCode() + secondClass.hashCode();
+    }
+
+    public String getFirstClass() {
+        return firstClass;
+    }
+
+    public String getsecondClass() {
+        return secondClass;
     }
 
 

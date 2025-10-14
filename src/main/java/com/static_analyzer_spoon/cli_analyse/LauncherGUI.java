@@ -27,16 +27,16 @@ public class LauncherGUI extends AbsractLauncher{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
         JTextArea textArea = new JTextArea();
-        textArea.setBounds(200, 200, 300, 400);
+        textArea.setBounds(200, 200, 600, 600);
         //frame.add(textArea);
         frame.setLayout(null);
 
         JScrollPane scrollPane = new JScrollPane(textArea);
         frame.add(scrollPane);
-        textArea.setBounds(200, 200, 400, 600);
+        textArea.setBounds(200, 200, 600, 600);
 
         // Set bounds for textArea to take the right side, full height
-        scrollPane.setBounds(200, 0, 580, 560);
+        scrollPane.setBounds(200, 0, 600, 600);
         frame.add(scrollPane);
 
         // Y position for buttons
@@ -135,7 +135,21 @@ public class LauncherGUI extends AbsractLauncher{
         graphButton.setBounds(buttonX, buttonY, buttonWidth, buttonHeight);
         graphButton.addActionListener(e -> GraphMethode.visualize());
         frame.add(graphButton);
+        buttonY += buttonHeight + 10;
 
+        // Button: Coupling string
+        JButton CouplingStringButton = new JButton("Show compling value");
+        CouplingStringButton.setBounds(buttonX, buttonY, buttonWidth, buttonHeight);
+        CouplingStringButton.addActionListener(e -> textArea.append(GraphMethode.toStringCouplage()+"\n"));
+        frame.add(CouplingStringButton);
+        buttonY += buttonHeight + 10;
+
+        // Button: Show coupling Graph
+        JButton graphCouplingButton = new JButton("Show coupling Graph");
+        graphCouplingButton.setBounds(buttonX, buttonY, buttonWidth, buttonHeight);
+        graphCouplingButton.addActionListener(e -> GraphMethode.visualizeCouplage());
+        frame.add(graphCouplingButton);
+        buttonY += buttonHeight + 10;
                 
         
         

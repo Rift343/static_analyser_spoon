@@ -52,6 +52,8 @@ public class ProcessorStaticAnalyze {
         }
 
         visitedPackage = visitorPackage.getVisited();
+
+        GraphMethode.computeAllCouplage();
     }
 
     public void calculAvg()
