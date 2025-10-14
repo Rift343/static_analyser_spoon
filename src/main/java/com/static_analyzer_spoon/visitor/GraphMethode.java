@@ -9,18 +9,18 @@ import org.graphstream.ui.view.Viewer;
 
 public class GraphMethode {
 
-    private static HashMap<String, Collection<String>> mapClassLigne = new java.util.HashMap<>();
+    private static final HashMap<GraphNode, Collection<GraphNode>> mapClassLigne = new java.util.HashMap<>();
 
-    public static void add(String methode, String newMethodMethode)
+    public static void add(GraphNode methode, GraphNode newMethodMethode)
     {
         if (mapClassLigne.containsKey(methode)) 
         {
-            Collection<String> list = mapClassLigne.get(methode);
+            Collection<GraphNode> list = mapClassLigne.get(methode);
             list.add(newMethodMethode);
             mapClassLigne.put(methode, list);
         } else 
         {
-            Collection<String> listMethode = new java.util.ArrayList<>();
+            Collection<GraphNode> listMethode = new java.util.ArrayList<>();
             listMethode.add(newMethodMethode);
             mapClassLigne.put(methode, listMethode);
         }
@@ -28,7 +28,7 @@ public class GraphMethode {
 
     public static void show()
     {
-        for (String key : mapClassLigne.keySet()) {
+        for (GraphNode key : mapClassLigne.keySet()) {
             System.out.println("Methode : " + key + " calls " + mapClassLigne.get(key).toString());
         }
     }
@@ -45,12 +45,14 @@ public static void visualize() {
     
 
 
-    for (String from : mapClassLigne.keySet()) {
+    for (GraphNode key : mapClassLigne.keySet()) {
+        String from = key.toString();
         if (graph.getNode(from) == null) {
             graph.addNode(from).setAttribute("ui.label", from);
         }
     
-        for (String to : mapClassLigne.get(from)) {
+        for (GraphNode node : mapClassLigne.get(key)) {
+            String to = node.toString();
             if (graph.getNode(to) == null) {
                 graph.addNode(to).setAttribute("ui.label", to);
             }

@@ -14,7 +14,7 @@ public class VisitorMethode extends CtScanner {
 
     private static int maxParametre = 0;//max number of parametre in a methode
     private static int ligneNumber = 0;//number of codeligne in a methode
-    private static Collection<String> allMethodCalled;//The method called by the methode
+    private static Collection<GraphNode> allMethodCalled;//The method called by the methode
     
     @Override
     public <T> void visitCtMethod(CtMethod<T> CtMethod) {
@@ -34,12 +34,12 @@ public class VisitorMethode extends CtScanner {
                                                                   .map(inv -> (CtExecutableReference<?>) inv.getExecutable())
                                                                   .collect(Collectors.toList());
         allMethodCalled = calledMethods.stream()
-            .map(ref -> ref.getDeclaringType() != null
-                ? ref.getDeclaringType().getQualifiedName() + "." + ref.getSimpleName()
-                : ref.getSimpleName())
+            .map(ref -> 
+                new GraphNode(ref.getDeclaringType().getQualifiedName(), ref.getSimpleName())
+                )
             .collect(Collectors.toList());
         
-        allMethodCalled.forEach(string -> {GraphMethode.add(CtMethod.getDeclaringType().getQualifiedName() + "." + CtMethod.getSimpleName(),string );});//Add to the graph the method call
+        allMethodCalled.forEach(string -> {GraphNode node = new GraphNode(CtMethod.getDeclaringType().getQualifiedName(),CtMethod.getSimpleName());GraphMethode.add(node,string );});//Add to the graph the method call
 
         
         
