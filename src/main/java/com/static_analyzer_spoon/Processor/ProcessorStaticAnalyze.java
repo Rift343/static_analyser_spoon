@@ -2,8 +2,18 @@ package com.static_analyzer_spoon.Processor;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
+import org.graphstream.graph.Graph;
+
+import com.static_analyzer_spoon.dendrogramme.Cluster;
 import com.static_analyzer_spoon.visitor.ClassComparator;
+import com.static_analyzer_spoon.visitor.CouplingIdentificator;
 import com.static_analyzer_spoon.visitor.GraphMethode;
 import com.static_analyzer_spoon.visitor.VisitorClass;
 import com.static_analyzer_spoon.visitor.VisitorPackage;
@@ -301,5 +311,100 @@ public class ProcessorStaticAnalyze {
     public int getVisitedPackage() {
         return visitedPackage;
     }
+
+    public static List<Cluster> initialClustersFromCouplingMap(Map<CouplingIdentificator, Double> mapCouplage) {
+        Set<String> allClassNames = GraphMethode.extractAllClassNames(mapCouplage);
+
+        List<Cluster> clusters = new ArrayList<>();
+        for (String className : allClassNames) {
+            clusters.add(new Cluster(className)); // constructeur avec une seule classe
+        }
+
+        return clusters;
+    }
+
+    public static List<Cluster> hierarchicalClustering(List<Cluster> clusters, Map<CouplingIdentificator, Double> mapCouplage) {
+        while (clusters.size() > 1) {
+            double maxCoupling = -1;
+            Cluster bestA = null, bestB = null;
+
+            for (int i = 0; i < clusters.size(); i++) {
+                for (int j = i + 1; j < clusters.size(); j++) {
+                    double coupling = computeAverageCoupling(clusters.get(i), clusters.get(j), mapCouplage);
+                    if (coupling > maxCoupling) {
+                        maxCoupling = coupling;
+                        bestA = clusters.get(i);
+                        bestB = clusters.get(j);
+                    }
+                }
+            }
+
+            Cluster merged = new Cluster(bestA, bestB, maxCoupling);
+            clusters.remove(bestA);
+            clusters.remove(bestB);
+            clusters.add(merged);
+        }
+
+        return clusters; // contient un seul cluster racine = dendrogramme
+    }
+
+    public static double computeAverageCoupling(Cluster a, Cluster b, Map<CouplingIdentificator, Double> mapCouplage) {
+        double total = 0.0;
+        int count = 0;
+
+        for (String classA : a.getClassNames()) {
+            for (String classB : b.getClassNames()) {
+                if (!classA.equals(classB)) {
+                    CouplingIdentificator id1 = new CouplingIdentificator(classA, classB);
+                    CouplingIdentificator id2 = new CouplingIdentificator(classB, classA);
+                    double value = mapCouplage.getOrDefault(id1, mapCouplage.getOrDefault(id2, 0.0));
+                    total += value;
+                    count++;
+                }
+            }
+        }
+
+        return count > 0 ? total / count : 0.0;
+    }
+
+    public static double computeAverageCoupling(Set<String> classes, Map<CouplingIdentificator, Double> mapCouplage) {
+        double total = 0.0;
+        int count = 0;
+
+        List<String> list = new ArrayList<>(classes);
+        for (int i = 0; i < list.size(); i++) {
+            for (int j = i + 1; j < list.size(); j++) {
+                CouplingIdentificator id1 = new CouplingIdentificator(list.get(i), list.get(j));
+                CouplingIdentificator id2 = new CouplingIdentificator(list.get(j), list.get(i));
+                total += mapCouplage.getOrDefault(id1, mapCouplage.getOrDefault(id2, 0.0));
+                count++;
+            }
+        }
+
+        return count > 0 ? total / count : 0.0;
+    }
+
+
+    public static List<Cluster> extractModules(Cluster root, Map<CouplingIdentificator, Double> mapCouplage, double CP, int maxModules) {
+        List<Cluster> modules = new ArrayList<>();
+        Queue<Cluster> queue = new LinkedList<>();
+        queue.add(root);
+
+        while (!queue.isEmpty() && modules.size() < maxModules) {
+            Cluster current = queue.poll();
+            double score = computeAverageCoupling(current.getClassNames(), mapCouplage);
+
+            if (score >= CP || current.isLeaf()) {
+                modules.add(current);
+            } else {
+                if (current.getLeft() != null) queue.add(current.getLeft());
+                if (current.getRight() != null) queue.add(current.getRight());
+            }
+        }
+        return modules;
+    }
+
+
+
 
 }

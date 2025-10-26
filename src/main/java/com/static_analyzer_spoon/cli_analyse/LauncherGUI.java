@@ -1,10 +1,18 @@
 package com.static_analyzer_spoon.cli_analyse;
 
+import java.util.HashMap;
+import java.util.List;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
 
+import com.static_analyzer_spoon.Processor.ProcessorStaticAnalyze;
+import com.static_analyzer_spoon.dendrogramme.Cluster;
+import com.static_analyzer_spoon.visitor.CouplingIdentificator;
 import com.static_analyzer_spoon.visitor.GraphMethode;
 
 public class LauncherGUI extends AbsractLauncher{
@@ -150,8 +158,24 @@ public class LauncherGUI extends AbsractLauncher{
         graphCouplingButton.addActionListener(e -> GraphMethode.visualizeCouplage());
         frame.add(graphCouplingButton);
         buttonY += buttonHeight + 10;
-                
+        HashMap<CouplingIdentificator, Double> mapCouplage = GraphMethode.getMapCouplage();
         
+        // Button: Show dendogram
+        JButton dendogram = new JButton("Show dendogram");
+        dendogram.setBounds(buttonX, buttonY, buttonWidth, buttonHeight);
+            dendogram.addActionListener(e -> {
+            // Étape 1 : Initialiser les clusters
+            List<Cluster> initialClusters = ProcessorStaticAnalyze.initialClustersFromCouplingMap(mapCouplage);
+
+            // Étape 2 : Appliquer le clustering hiérarchique
+            List<Cluster> result = ProcessorStaticAnalyze.hierarchicalClustering(initialClusters, mapCouplage);
+            Cluster rootCluster = result.get(0); // racine du dendrogramme
+
+            showDendrogram(rootCluster);
+        });
+
+        frame.add(dendogram);
+        buttonY += buttonHeight + 10;
         
         
         
@@ -159,11 +183,40 @@ public class LauncherGUI extends AbsractLauncher{
         
         frame.setLayout(null);
         frame.setVisible(true);
-
-
-
-        
-        
     }
+
+    public static void showDendrogram(Cluster rootCluster) {
+        DefaultMutableTreeNode rootNode = buildTreeNode(rootCluster);
+        JTree tree = new JTree(rootNode);
+
+        JScrollPane scrollPane = new JScrollPane(tree);
+        JFrame frame = new JFrame("Dendrogramme des classes");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(scrollPane);
+        frame.setSize(500, 600);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
+    public static DefaultMutableTreeNode buildTreeNode(Cluster cluster) {
+    // Crée un label avec les noms de classes et le score de couplage
+    String label = String.join(", ", cluster.getClassNames());
+    label += " [score=" + String.format("%.6f", cluster.getAverageCoupling()) + "]";
+
+    // Crée le nœud Swing
+    DefaultMutableTreeNode node = new DefaultMutableTreeNode(label);
+
+    // Ajoute récursivement les sous-clusters
+    if (cluster.getLeft() != null) {
+        node.add(buildTreeNode(cluster.getLeft()));
+    }
+    if (cluster.getRight() != null) {
+        node.add(buildTreeNode(cluster.getRight()));
+    }
+
+    return node;
+}
+
+
 
 }

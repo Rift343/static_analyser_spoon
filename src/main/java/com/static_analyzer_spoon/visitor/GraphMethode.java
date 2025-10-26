@@ -2,6 +2,10 @@ package com.static_analyzer_spoon.visitor;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.graphstream.graph.*;
 import org.graphstream.graph.implementations.*;
 import org.graphstream.ui.swing_viewer.ViewPanel;
@@ -36,11 +40,7 @@ public class GraphMethode {
         for (GraphNode key : mapClassLigne.keySet()) {
             System.out.println("Methode : " + key + " calls " + mapClassLigne.get(key).toString());
         }
-    }
-
-
-
-    
+    }    
 
     public static void visualize() {
         System.setProperty("org.graphstream.ui", "swing"); // Pour forcer l'affichage en Swing
@@ -68,7 +68,6 @@ public class GraphMethode {
             }
         }
 
-        
         graph.setAttribute("ui.stylesheet", "node { text-mode: normal; fill-color: lightblue; text-color: black; size: 10px;  } node:hover { text-mode: normal; text-color: black; } edge { arrow-shape: arrow;fill-color:#222;arrow-size:5px,3px; } ");
         Viewer viewer = graph.display(false);
         ViewPanel viewPanel = (ViewPanel) viewer.getDefaultView();
@@ -77,8 +76,6 @@ public class GraphMethode {
 
         viewPanel.resizeFrame(2000, 2000);
         viewPanel.getCamera().setViewCenter(0, 0, 0);
-
-
 
         viewer.enableAutoLayout();
     }
@@ -172,7 +169,6 @@ public class GraphMethode {
                     graph.getEdge(edgeId).setAttribute("ui.label", mapCouplage.get(identificator));
                 }
         
-
         }
         graph.setAttribute("ui.stylesheet", "node { text-mode: normal; fill-color: lightblue; text-color: black; size: 10px;  } node:hover { text-mode: normal; text-color: black; } edge { arrow-shape: arrow;fill-color:#222;arrow-size:5px,3px; } ");
         Viewer viewer = graph.display(false);
@@ -183,14 +179,31 @@ public class GraphMethode {
         viewPanel.resizeFrame(2000, 2000);
         viewPanel.getCamera().setViewCenter(0, 0, 0);
 
-
-
         viewer.enableAutoLayout();
-
-
 
     }
     
+    public static Set<String> extractAllClassNames(Map<CouplingIdentificator, Double> mapCouplage) {
+        Set<String> classNames = new HashSet<>();
+
+        for (CouplingIdentificator id : mapCouplage.keySet()) {
+            String className = id.getFirstClass();
+            if (!classNames.contains(className)) {
+                classNames.add(className);
+            }
+            className = id.getsecondClass();
+            if (!classNames.contains(className)) {
+                classNames.add(className);
+            }
+        }
+
+        return classNames;
+    }
+
+    public static HashMap<CouplingIdentificator, Double> getMapCouplage() {
+        return mapCouplage;
+    }
+
 
     
 
