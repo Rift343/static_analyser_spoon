@@ -12,6 +12,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.static_analyzer_spoon.Processor.ProcessorStaticAnalyze;
 import com.static_analyzer_spoon.dendrogramme.Cluster;
+import com.static_analyzer_spoon.dendrogramme.Dendrogramme;
 import com.static_analyzer_spoon.visitor.CouplingIdentificator;
 import com.static_analyzer_spoon.visitor.GraphMethode;
 
@@ -165,13 +166,9 @@ public class LauncherGUI extends AbsractLauncher{
         dendogram.setBounds(buttonX, buttonY, buttonWidth, buttonHeight);
             dendogram.addActionListener(e -> {
             // Étape 1 : Initialiser les clusters
-            List<Cluster> initialClusters = ProcessorStaticAnalyze.initialClustersFromCouplingMap(mapCouplage);
-
-            // Étape 2 : Appliquer le clustering hiérarchique
-            List<Cluster> result = ProcessorStaticAnalyze.hierarchicalClustering(initialClusters, mapCouplage);
-            Cluster rootCluster = result.get(0); // racine du dendrogramme
-
-            showDendrogram(rootCluster);
+            
+            
+            showDendrogram(Dendrogramme.getRootCluster());
         });
 
         frame.add(dendogram);

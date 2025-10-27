@@ -8,7 +8,6 @@ import com.static_analyzer_spoon.visitor.GraphMethode;
 public class LauncherCLI extends AbsractLauncher{
 
     
-
     public LauncherCLI (String pathString, boolean forMavenInput) {
         path = pathString;
         forMaven = forMavenInput;

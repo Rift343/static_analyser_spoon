@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import spoon.reflect.code.CtInvocation;
+import spoon.reflect.cu.SourcePosition;
+import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.reference.CtExecutableReference;
 import spoon.reflect.visitor.CtScanner;
@@ -45,6 +47,41 @@ public class VisitorMethode extends CtScanner {
         
         super.visitCtMethod(CtMethod);
     }
+
+    @Override
+    public <T> void visitCtConstructor(CtConstructor<T> ctConstructor) {
+        // Nombre de paramètres
+        int numberOfParameter = ctConstructor.getParameters().size();
+        if (numberOfParameter > maxParametre) {
+            maxParametre = numberOfParameter;
+        }
+
+        // Nombre de lignes : méthode robuste
+        SourcePosition pos = ctConstructor.getPosition();
+        if (pos != null && pos.isValidPosition()) {
+            ligneNumber = pos.getEndLine() - pos.getLine() + 1;
+        } else {
+            ligneNumber = 0;
+        }
+
+        // Appels de méthodes
+        List<CtInvocation<?>> invocations = ctConstructor.getElements(new TypeFilter<>(CtInvocation.class));
+        List<CtExecutableReference<?>> calledMethods = invocations.stream()
+            .map(inv -> inv.getExecutable())
+            .collect(Collectors.toList());
+
+        allMethodCalled = calledMethods.stream()
+            .map(ref -> new GraphNode(ref.getDeclaringType().getQualifiedName(), ref.getSimpleName()))
+            .collect(Collectors.toList());
+
+        // Ajout au graphe
+        GraphNode source = new GraphNode(ctConstructor.getDeclaringType().getQualifiedName(), ctConstructor.getSimpleName());
+        allMethodCalled.forEach(target -> GraphMethode.add(source, target));
+
+        super.visitCtConstructor(ctConstructor);
+    }
+
+
 
     public static int getMaxParametre() {
         return maxParametre;

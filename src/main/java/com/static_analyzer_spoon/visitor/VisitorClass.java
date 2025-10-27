@@ -2,8 +2,11 @@ package com.static_analyzer_spoon.visitor;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import spoon.reflect.declaration.CtClass;
+import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.reference.CtFieldReference;
 import spoon.reflect.visitor.CtScanner;
@@ -40,6 +43,22 @@ public class VisitorClass extends CtScanner    {
             avgLigneMethod = avgLigneMethod + VisitorMethode.getLigneNumber();
             maxParametre = VisitorMethode.getMaxParametre();
         }
+
+        // Constructeurs
+        Set<CtConstructor<T>> rawConstructors = ctClass.getConstructors();
+        List<CtConstructor<?>> allConstructors = new ArrayList<>();
+
+        for (CtConstructor<T> constructor : rawConstructors) {
+            allConstructors.add(constructor);
+        }
+
+        countMethod += allConstructors.size(); // si tu veux inclure les constructeurs dans le total des "méthodes"
+
+        for (CtConstructor<?> ctConstructor : allConstructors) {
+            ctConstructor.accept(visitorMethode);
+            avgLigneMethod += VisitorMethode.getLigneNumber();
+            maxParametre = Math.max(maxParametre, VisitorMethode.getMaxParametre());
+    }
 
         //Average number of field in a class (just add not divide by the number of class)
         Collection<CtFieldReference<?>> allField = ctClass.getAllFields(); 
