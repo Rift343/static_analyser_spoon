@@ -1,16 +1,28 @@
 package com.static_analyzer_spoon.cli_analyse;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import com.static_analyzer_spoon.Processor.ProcessorStaticAnalyze;
+import org.graphstream.graph.Edge;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.ui.view.Viewer;
+
 import com.static_analyzer_spoon.dendrogramme.Cluster;
 import com.static_analyzer_spoon.dendrogramme.Dendrogramme;
 import com.static_analyzer_spoon.visitor.CouplingIdentificator;
@@ -173,11 +185,34 @@ public class LauncherGUI extends AbsractLauncher{
 
         frame.add(dendogram);
         buttonY += buttonHeight + 10;
+
+        //show module
+        JLabel cpLabel = new JLabel("Seuil CP :");
+        cpLabel.setBounds(buttonX, buttonY, buttonWidth, buttonHeight);
+        frame.add(cpLabel);
+
+        buttonY += buttonHeight + 10;
+
+        JTextField cpField = new JTextField("0.05"); // valeur par défaut
+        cpField.setBounds(buttonX, buttonY, buttonWidth, buttonHeight);
+        frame.add(cpField);
+        buttonY += buttonHeight + 10;
+
+        JButton showModulesButton = new JButton("Afficher le dendrogramme");
+        showModulesButton.setBounds(buttonX, buttonY, buttonWidth, buttonHeight);
+        frame.add(showModulesButton);
+
+        showModulesButton.addActionListener(e -> {
+            afficherModulesExtraits(Double.parseDouble(cpField.getText()), mapCouplage, Dendrogramme.getRootCluster());
+        });
+
+        
+
         
         
         
         
-        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(null);
         frame.setVisible(true);
     }
@@ -188,7 +223,7 @@ public class LauncherGUI extends AbsractLauncher{
 
         JScrollPane scrollPane = new JScrollPane(tree);
         JFrame frame = new JFrame("Dendrogramme des classes");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.add(scrollPane);
         frame.setSize(500, 600);
         frame.setLocationRelativeTo(null);
@@ -196,23 +231,113 @@ public class LauncherGUI extends AbsractLauncher{
     }
 
     public static DefaultMutableTreeNode buildTreeNode(Cluster cluster) {
-    // Crée un label avec les noms de classes et le score de couplage
-    String label = String.join(", ", cluster.getClassNames());
-    label += " [score=" + String.format("%.6f", cluster.getAverageCoupling()) + "]";
+        // Crée un label avec les noms de classes et le score de couplage
+        String label = "";    
+        if (cluster.isLeaf()) {
+            label = String.join("",cluster.getClassNames());
+        }
 
-    // Crée le nœud Swing
-    DefaultMutableTreeNode node = new DefaultMutableTreeNode(label);
+        if (!cluster.isLeaf()){
+            label += " [score=" + String.format("%.6f", cluster.getAverageCoupling()) + "]";
+        }
+        
 
-    // Ajoute récursivement les sous-clusters
-    if (cluster.getLeft() != null) {
-        node.add(buildTreeNode(cluster.getLeft()));
+        // Crée le nœud Swing
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(label);
+
+        // Ajoute récursivement les sous-clusters
+        if (cluster.getLeft() != null) {
+            node.add(buildTreeNode(cluster.getLeft()));
+        }
+        if (cluster.getRight() != null) {
+            node.add(buildTreeNode(cluster.getRight()));
+        }
+
+        return node;
     }
-    if (cluster.getRight() != null) {
-        node.add(buildTreeNode(cluster.getRight()));
+
+    public Map<String, String> assignColors(List<Cluster> modules) {
+        Map<String, String> classToColor = new HashMap<>();
+        List<String> palette = Arrays.asList(
+            "red", "blue", "green", "orange", "purple", "cyan", "magenta", "yellow", "gray", "brown"
+        );
+
+        int colorIndex = 0;
+
+        for (Cluster module : modules) {
+            String color = palette.get(colorIndex % palette.size());
+            for (String className : module.getClassNames()) {
+                classToColor.put(className, color);
+            }
+            colorIndex++;
+        }
+
+        return classToColor;
     }
 
-    return node;
-}
+    public void afficherModulesExtraits(double cp, Map<CouplingIdentificator, Double> mapCouplage, Cluster racine) {
+        int maxModules = mapCouplage.size() / 2;
+        List<Cluster> modules = Dendrogramme.extractModules(mapCouplage, cp, maxModules);
+        Map<String, String> classToColor = assignColors(modules);
+
+        System.setProperty("org.graphstream.ui", "swing");
+        Graph graph = new SingleGraph("Modules extraits");
+        graph.setAttribute("ui.quality");
+        graph.setAttribute("ui.antialias");
+
+        for (Cluster module : modules) {
+            Set<String> classes = module.getClassNames();
+            String color = classToColor.get(classes.iterator().next());
+            List<String> classList = new ArrayList<>(classes);
+
+            for (String className : classList) {
+                if (graph.getNode(className) == null) {
+                    Node a = graph.addNode(className);
+                    a.setAttribute("ui.label", className);
+                    a.setAttribute("ui.style", "fill-color: " + color + ";");
+                }
+            }
+
+            for (int i = 0; i < classList.size(); i++) {
+                for (int j = i + 1; j < classList.size(); j++) {
+                    String classA = classList.get(i);
+                    String classB = classList.get(j);
+                    CouplingIdentificator idAB = new CouplingIdentificator(classA, classB);
+                    CouplingIdentificator idBA = new CouplingIdentificator(classB, classA);
+                    Double score = mapCouplage.getOrDefault(idAB, mapCouplage.get(idBA));
+                    if (score != null) {
+                        String edgeId = classA + "--" + classB;
+                        if (graph.getEdge(edgeId) == null) {
+                            Edge edge = graph.addEdge(edgeId, classA, classB);
+                            edge.setAttribute("ui.label", score);
+                        }
+                    }
+                }
+            }
+        }
+        
+        List<Node> toRemove = new ArrayList<>();
+        for (Node node : graph) {
+            if (node.getDegree() == 0) {
+                toRemove.add(node);
+            }
+        }
+        for (Node node : toRemove) {
+            graph.removeNode(node);
+        } 
+
+
+        graph.setAttribute("ui.stylesheet",
+            "node { text-mode: normal; size: 10px; text-color: black; }" +
+            "node:hover { text-mode: normal; text-color: black; }" +
+            "edge { arrow-shape: arrow; fill-color: #222; arrow-size: 5px, 3px; }"
+        );
+
+        Viewer viewer = graph.display(false);
+        viewer.setCloseFramePolicy(Viewer.CloseFramePolicy.CLOSE_VIEWER);
+        viewer.enableAutoLayout();
+    }
+
 
 
 

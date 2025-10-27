@@ -15,7 +15,6 @@ import com.static_analyzer_spoon.visitor.GraphMethode;
 public class Dendrogramme {
 
     static List<Cluster> clustersD;
-    List<Cluster> modules;
 
     public Dendrogramme(Map<CouplingIdentificator, Double> mapCouplage, double CP, int maxModules) {
         Set<String> allClassNames = GraphMethode.extractAllClassNames(mapCouplage);
@@ -27,11 +26,10 @@ public class Dendrogramme {
 
         this.clustersD = clusters;
         hierarchicalClustering(mapCouplage);
-        this.modules = extractModules(mapCouplage, CP, maxModules);
 
     }
 
-    private List<Cluster> extractModules(Map<CouplingIdentificator, Double> mapCouplage, double CP, int maxModules) {
+    public static List<Cluster> extractModules(Map<CouplingIdentificator, Double> mapCouplage, double CP, int maxModules) {
         Cluster root = clustersD.get(0); // racine du dendrogramme
         List<Cluster> modules = new ArrayList<>();
         Queue<Cluster> queue = new LinkedList<>();
@@ -56,7 +54,7 @@ public class Dendrogramme {
             double maxCoupling = -1;
             Cluster bestA = null, bestB = null;
 
-            for (int i = 0; i < clustersD.size(); i++) {
+            for (int i = 0; i < clustersD.size(); i++) {//recupère les classes les plus couplées
                 for (int j = i + 1; j < clustersD.size(); j++) {
                     double coupling = ProcessorStaticAnalyze.computeAverageCoupling(clustersD.get(i), clustersD.get(j), mapCouplage);
                     if (coupling > maxCoupling) {
@@ -75,9 +73,6 @@ public class Dendrogramme {
         // contient un seul cluster racine = dendrogramme
     }
 
-    public List<Cluster> getModules() {
-        return modules;
-    }
 
     public static Cluster getRootCluster() {
         return clustersD.get(0);

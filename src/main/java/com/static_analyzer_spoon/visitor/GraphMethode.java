@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.JFrame;
+
 import org.graphstream.graph.*;
 import org.graphstream.graph.implementations.*;
 import org.graphstream.ui.swing_viewer.ViewPanel;
@@ -76,7 +78,7 @@ public class GraphMethode {
 
         viewPanel.resizeFrame(2000, 2000);
         viewPanel.getCamera().setViewCenter(0, 0, 0);
-
+        viewer.setCloseFramePolicy(Viewer.CloseFramePolicy.CLOSE_VIEWER);
         viewer.enableAutoLayout();
     }
 
@@ -151,7 +153,7 @@ public class GraphMethode {
         Graph graph = new SingleGraph("Coupling graph");
         graph.setAttribute("ui.quality");
         graph.setAttribute("ui.antialias");
-
+        
         for (CouplingIdentificator identificator : mapCouplage.keySet())
         {
             String nodeA = identificator.getFirstClass();
@@ -175,10 +177,9 @@ public class GraphMethode {
         ViewPanel viewPanel = (ViewPanel) viewer.getDefaultView();
         viewPanel.setPreferredSize(new java.awt.Dimension(2000, 2000));
         viewPanel.setVisible(true);
-
         viewPanel.resizeFrame(2000, 2000);
         viewPanel.getCamera().setViewCenter(0, 0, 0);
-
+        viewer.setCloseFramePolicy(Viewer.CloseFramePolicy.CLOSE_VIEWER);
         viewer.enableAutoLayout();
 
     }
