@@ -20,10 +20,10 @@ Le fichier JAR généré se trouvera dans le dossier `target`.
 
 Pour lancer le fichier JAR avec `java -jar`, plusieurs arguments supplémentaires sont nécessaires pour configurer le lancement. Certains sont **obligatoires**, d'autres **optionnels** :
 
-- 🔴 `---path=<Chemin absolu>` : permet d'indiquer le projet à analyser. **(obligatoire)**
-- 🟢 `---ForMaven` : indique si le projet à analyser est un projet Maven. Si le projet n'utilise pas Maven, il n'y a aucun paramètre à fournir.
-- 🟢 `---WithCLI` : permet d'afficher le projet sous forme de CLI dans le terminal (par défaut si non renseigné).
-- 🟢 `---WithGUI` : permet d'afficher le projet avec une interface graphique.
+-  `---path=<Chemin absolu>` : permet d'indiquer le projet à analyser. **(obligatoire)**
+-  `---ForMaven` : indique si le projet à analyser est un projet Maven. Si le projet n'utilise pas Maven, il n'y a aucun paramètre à fournir.
+-  `---WithCLI` : permet d'afficher le projet sous forme de CLI dans le terminal (par défaut si non renseigné).
+-  `---WithGUI` : permet d'afficher le projet avec une interface graphique.
 
 ⚠️ Si `---WithGUI` et `---WithCLI` sont tous les deux renseignés, alors l'application émet une erreur.
 
