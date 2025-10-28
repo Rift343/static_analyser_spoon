@@ -54,10 +54,10 @@ public class LauncherGUI extends AbsractLauncher{
 
         JScrollPane scrollPane = new JScrollPane(textArea);
         frame.add(scrollPane);
-        textArea.setBounds(200, 200, 600, 600);
+        textArea.setBounds(200, 200, 1200, 900);
 
         // Set bounds for textArea to take the right side, full height
-        scrollPane.setBounds(200, 0, 600, 600);
+        scrollPane.setBounds(200, 0, 1200, 900);
         frame.add(scrollPane);
 
         // Y position for buttons
