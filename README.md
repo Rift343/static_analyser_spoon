@@ -1,5 +1,3 @@
-Voici ton contenu LaTeX converti en Markdown, sans reformulation :
-
 ---
 
 # Lancement de l'application
